@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buddywears | Premium Campus Laundry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #00d2ff;
+            --deep-blue: #3a7bd5;
+            --glass: rgba(255, 255, 255, 0.25);
+            --text-dark: #1a2a3a;
+            --success: #28a745;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+
+        /* --- Animated Liquid Background --- */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Bubbles Effect */
+        .bubbles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+        .bubble {
+            position: absolute; bottom: -100px; width: 40px; height: 40px;
+            background: rgba(255, 255, 255, 0.3); border-radius: 50%;
+            opacity: 0.5; animation: rise 10s infinite ease-in;
+        }
+        @keyframes rise {
+            0% { bottom: -100px; transform: translateX(0); }
+            50% { transform: translateX(100px); }
+            100% { bottom: 1080px; transform: translateX(-200px); }
+        }
+
+        /* --- Container Styles --- */
+        .app-container {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 30px;
+            width: 100%;
+            max-width: 450px; 
+            padding: 40px 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .customer-view { width: 100%; margin: 0 auto; }
+        
+        .logo-area { text-align: center; margin-bottom: 30px; }
+        .logo-icon { font-size: 50px; margin-bottom: 10px; filter: drop-shadow(0 0 10px white); }
+        h1 { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 span { color: var(--text-dark); font-weight: 300; }
+
+        .input-group { margin-bottom: 15px; text-align: left; }
+        label { font-size: 0.8rem; font-weight: 600; margin-left: 10px; color: #fff; }
+        input { 
+            width: 100%; padding: 15px; border-radius: 15px; border: none; 
+            background: rgba(255, 255, 255, 0.9); margin-top: 5px; outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .item-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.8); padding: 12px 15px;
+            border-radius: 15px; margin-bottom: 10px;
+        }
+
+        .qty-input { width: 70px !important; text-align: center; padding: 8px !important; margin-top: 0 !important; }
+
+        .btn-main {
+            width: 100%; padding: 18px; border-radius: 18px; border: none;
+            background: linear-gradient(135deg, #1a2a3a 0%, #3a7bd5 100%);
+            color: white; font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+
+        /* Dashboard Styles */
+        #admin-panel { margin-top: 30px; display: none; text-align: left; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 12px; border-radius: 15px; text-align: center; }
+        .stat-card h4 { font-size: 0.6rem; color: #777; }
+        .stat-card p { font-size: 1rem; font-weight: 700; color: var(--deep-blue); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.75rem; background: #fff; border-radius: 10px; overflow: hidden; }
+        th { text-align: left; padding: 10px; background: #eee; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+
+        .hidden { display: none; }
+        .admin-toggle { font-size: 0.7rem; color: #fff; cursor: pointer; margin-top: 20px; text-decoration: underline; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="bubbles" id="bubble-container"></div>
+
+    <div class="app-container" id="main-box">
+        <div id="customer-side" class="customer-view">
+            <div class="logo-area">
+                <div class="logo-icon">🧼</div>
+                <h1>Buddy<span>wears</span></h1>
+                <p style="letter-spacing: 2px; font-size: 0.7rem; color: #fff; font-weight: 600;">PREMIUM CAMPUS LAUNDRY</p>
+            </div>
+
+            <div id="auth-screen">
+                <div class="input-group"><label>Full Name</label><input type="text" id="cust-name" placeholder="Enter your name"></div>
+                <div class="input-group"><label>Hostel / Pickup Point</label><input type="text" id="cust-hostel" placeholder="e.g. Owa-Alero Hall"></div>
+                <button class="btn-main" onclick="startOrder()">Start New Order</button>
+            </div>
+
+            <div id="order-screen" class="hidden">
+                <h3 style="margin-bottom: 15px; font-size: 1rem; color: white;">Welcome, <span id="display-name" style="color: #1a2a3a;"></span></h3>
+                
+                <div class="item-row"><div><strong>Shirt</strong><br><small>₦500</small></div><input type="number" class="qty-input" id="q-shirt" value="0" min="0" onchange="calcTotal()"></div>
+                <div class="item-row"><div><strong>Trouser</strong><br><small>₦500</small></div><input type="number" class="qty-input" id="q-trouser" value="0" min="0" onchange="calcTotal()"></div>
+                <div class="item-row"><div><strong>Bedsheet</strong><br><small>₦1,000</small></div><input type="number" class="qty-input" id="q-sheet" value="0" min="0" onchange="calcTotal()"></div>
+                <div class="item-row"><div><strong>Duvet</strong><br><small>₦3,000</small></div><input type="number" class="qty-input" id="q-duvet" value="0" min="0" onchange="calcTotal()"></div>
+
+                <div style="text-align: center; margin: 20px 0; color: white;">
+                    <p style="font-size: 0.8rem; opacity: 0.9;">Estimated Total</p>
+                    <div style="font-size: 2rem; font-weight: 700;">₦<span id="total-val">0</span></div>
+                </div>
+
+                <button class="btn-main" onclick="confirmAndSend()">Order via WhatsApp</button>
+            </div>
+            <p class="admin-toggle" onclick="requestAdminAccess()">Admin Dashboard</p>
+        </div>
+
+        <div id="admin-panel">
+            <h2 style="font-family: 'Playfair Display', serif; color: #1a2a3a; margin-bottom: 15px;">Business Intel</h2>
+            <div class="stats-grid">
+                <div class="stat-card"><h4>Revenue</h4><p>₦<span id="stat-rev">0</span></p></div>
+                <div class="stat-card"><h4>Exp (15%)</h4><p>₦<span id="stat-exp">0</span></p></div>
+                <div class="stat-card"><h4>Net Profit</h4><p style="color: var(--success);">₦<span id="stat-profit">0</span></p></div>
+                <div class="stat-card"><h4>Orders</h4><p id="stat-count">0</p></div>
+            </div>
+            <div style="max-height: 200px; overflow-y: auto; border-radius: 10px;">
+                <table>
+                    <tbody id="order-history"></tbody>
+                </table>
+            </div>
+            <button onclick="closeAdmin()" style="width:100%; margin-top:15px; padding:10px; border-radius:10px; border:none; background:#1a2a3a; color:#fff; cursor:pointer;">Exit Dashboard</button>
+            <p onclick="clearHistory()" style="color:red; font-size:0.6rem; text-align:center; margin-top:10px; cursor:pointer;">Clear All Data</p>
+        </div>
+    </div>
+
+    <script>
+        const WA_PHONE = "2349075507008";
+        const COST_PERCENTAGE = 0.15;
+        const ADMIN_CODE = "9909";
+
+        // Background bubbles logic
+        const container = document.getElementById('bubble-container');
+        for (let i = 0; i < 15; i++) {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.style.left = `${Math.random() * 100}%`;
+            bubble.style.width = bubble.style.height = `${Math.random() * 50 + 20}px`;
+            bubble.style.animationDelay = `${Math.random() * 8}s`;
+            bubble.style.animationDuration = `${Math.random() * 5 + 7}s`;
+            container.appendChild(bubble);
+        }
+
+        function startOrder() {
+            const name = document.getElementById('cust-name').value;
+            const hostel = document.getElementById('cust-hostel').value;
+            if (name.length < 2 || hostel.length < 2) return alert("Please enter details!");
+            localStorage.setItem('buddy_name', name);
+            localStorage.setItem('buddy_hostel', hostel);
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('order-screen').classList.remove('hidden');
+            document.getElementById('display-name').innerText = name;
+        }
+
+        function calcTotal() {
+            const s = document.getElementById('q-shirt').value * 500;
+            const t = document.getElementById('q-trouser').value * 500;
+            const b = document.getElementById('q-sheet').value * 1000;
+            const d = document.getElementById('q-duvet').value * 3000;
+            document.getElementById('total-val').innerText = (s + t + b + d).toLocaleString();
+        }
+
+        function confirmAndSend() {
+            const name = localStorage.getItem('buddy_name');
+            const hostel = localStorage.getItem('buddy_hostel');
+            const s = document.getElementById('q-shirt').value;
+            const t = document.getElementById('q-trouser').value;
+            const b = document.getElementById('q-sheet').value;
+            const d = document.getElementById('q-duvet').value;
+            const totalStr = document.getElementById('total-val').innerText;
+            const totalNum = parseInt(totalStr.replace(/,/g, ''));
+
+            if (totalNum === 0) return alert("Select items!");
+
+            const cost = totalNum * COST_PERCENTAGE;
+            const profit = totalNum - cost;
+
+            const order = { date: new Date().toLocaleDateString(), customer: name, items: `${s}S,${t}T,${b}B,${d}D`, amount: totalNum };
+            let history = JSON.parse(localStorage.getItem('buddy_orders') || "[]");
+            history.push(order);
+            localStorage.setItem('buddy_orders', JSON.stringify(history));
+
+            const text = `*✨ NEW BUDDYWEARS ORDER ✨*%0A%0A*Customer:* ${name}%0A*Location:* ${hostel}%0A--------------------------%0A👕 Shirts: ${s}%0A👖 Trousers: ${t}%0A🛏️ Bedsheets: ${b}%0A🧺 Duvets: ${d}%0A--------------------------%0A*TOTAL: ₦${totalStr}*%0A%0A_--- Business Intel ---_%0A💰 Cost: ₦${cost.toLocaleString()}%0A📈 Profit: ₦${profit.toLocaleString()}`;
+
+            window.open(`https://wa.me/${WA_PHONE}?text=${text}`, '_blank');
+        }
+
+        // --- Secured Admin Functions ---
+        function requestAdminAccess() {
+            const pass = prompt("Enter Admin Access Code:");
+            if (pass === ADMIN_CODE) {
+                openAdmin();
+            } else if (pass !== null) {
+                alert("Incorrect Code. Access Denied.");
+            }
+        }
+
+        function openAdmin() {
+            document.getElementById('customer-side').style.display = "none";
+            document.getElementById('admin-panel').style.display = "block";
+            document.getElementById('main-box').style.maxWidth = "600px";
+            loadStats();
+        }
+
+        function closeAdmin() {
+            document.getElementById('admin-panel').style.display = "none";
+            document.getElementById('customer-side').style.display = "block";
+            document.getElementById('main-box').style.maxWidth = "450px";
+        }
+
+        function loadStats() {
+            const history = JSON.parse(localStorage.getItem('buddy_orders') || "[]");
+            const tableBody = document.getElementById('order-history');
+            let rev = 0;
+            tableBody.innerHTML = "";
+            [...history].reverse().forEach(o => {
+                rev += o.amount;
+                tableBody.innerHTML += `<tr><td>${o.customer}</td><td>${o.items}</td><td>₦${o.amount}</td></tr>`;
+            });
+            const exp = rev * COST_PERCENTAGE;
+            document.getElementById('stat-rev').innerText = rev.toLocaleString();
+            document.getElementById('stat-exp').innerText = exp.toLocaleString();
+            document.getElementById('stat-profit').innerText = (rev - exp).toLocaleString();
+            document.getElementById('stat-count').innerText = history.length;
+        }
+
+        function clearHistory() {
+            if(confirm("Permanently delete all business records?")) {
+                localStorage.removeItem('buddy_orders');
+                loadStats();
+            }
+        }
+    </script>
+</body>
+</html>
